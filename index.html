@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLACKHOLE TIKTOK</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Orbitron',sans-serif;}
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        body{background:#000;color:#fff;min-height:100vh;overflow-x:hidden;position:relative;}
+        
+        #canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.8;}
+        
+        .glow{text-shadow:0 0 10px #fff,0 0 20px #fff,0 0 30px #0ff;}
+        .glow-blue{text-shadow:0 0 10px #0ff,0 0 20px #0ff,0 0 30px #0ff;}
+        
+        .container{max-width:1200px;margin:0 auto;padding:20px;position:relative;z-index:10;}
+        
+        header{text-align:center;padding:40px 0;}
+        .title{font-size:4rem;font-weight:900;letter-spacing:5px;text-transform:uppercase;
+               background:linear-gradient(135deg,#fff 0%,#aaa 50%,#fff 100%);
+               -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+               animation:pulse 3s infinite;}
+        @keyframes pulse{0%{opacity:0.9;}50%{opacity:1;text-shadow:0 0 30px #0ff;}100%{opacity:0.9;}}
+        
+        .search{background:rgba(10,10,20,0.7);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.2);
+                border-radius:50px;padding:10px;margin:40px 0;display:flex;flex-wrap:wrap;gap:10px;
+                box-shadow:0 0 30px rgba(0,255,255,0.2);}
+        .search input{flex:1;min-width:250px;background:transparent;border:none;padding:15px 25px;
+                      font-size:1rem;color:#fff;outline:none;}
+        .search input::placeholder{color:rgba(255,255,255,0.5);letter-spacing:2px;}
+        .search button{background:linear-gradient(135deg,#0ff 0%,#0099ff 100%);border:none;
+                       border-radius:40px;padding:15px 40px;font-weight:700;font-size:1rem;
+                       text-transform:uppercase;letter-spacing:2px;color:#000;cursor:pointer;
+                       transition:all 0.3s;box-shadow:0 0 20px #0ff;}
+        .search button:hover{transform:scale(1.05);box-shadow:0 0 30px #0ff;}
+        
+        .loading{text-align:center;padding:50px;display:none;}
+        .spinner{width:60px;height:60px;border:5px solid rgba(255,255,255,0.1);
+                 border-top:5px solid #0ff;border-radius:50%;animation:spin 1s linear infinite;
+                 margin:0 auto 20px;}
+        @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+        
+        .result{display:none;margin-top:40px;}
+        .card{background:rgba(20,20,30,0.8);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);
+              border-radius:20px;padding:25px;box-shadow:0 0 50px rgba(0,255,255,0.2);
+              display:flex;flex-wrap:wrap;gap:25px;}
+        .preview{flex:1;min-width:300px;border-radius:15px;overflow:hidden;box-shadow:0 0 30px #000;}
+        .preview video{width:100%;height:auto;display:block;}
+        .info{flex:1;min-width:300px;padding:20px;}
+        .info h2{font-size:1.5rem;margin-bottom:20px;}
+        .meta{font-size:0.9rem;color:#aaa;margin-bottom:30px;display:flex;flex-wrap:wrap;gap:20px;}
+        .meta span{display:flex;align-items:center;gap:8px;}
+        .meta i{color:#0ff;}
+        
+        .buttons{display:flex;flex-wrap:wrap;gap:15px;}
+        .btn{flex:1;min-width:150px;padding:15px 25px;border:none;border-radius:10px;
+             font-weight:600;font-size:1rem;text-transform:uppercase;letter-spacing:2px;
+             cursor:pointer;transition:all 0.3s;text-decoration:none;text-align:center;}
+        .btn-primary{background:linear-gradient(135deg,#0ff 0%,#0099ff 100%);color:#000;box-shadow:0 0 20px #0ff;}
+        .btn-primary:hover{transform:translateY(-3px);box-shadow:0 0 30px #0ff;}
+        .btn-secondary{background:transparent;border:2px solid #0ff;color:#0ff;}
+        .btn-secondary:hover{background:rgba(0,255,255,0.1);transform:translateY(-3px);}
+        .btn-watermark{background:linear-gradient(135deg,#f0f 0%,#90f 100%);color:#fff;box-shadow:0 0 20px #f0f;}
+        
+        .error{background:rgba(255,0,0,0.2);border:1px solid #f00;border-radius:10px;padding:20px;
+               margin-top:20px;color:#f66;text-align:center;display:none;}
+        
+        footer{text-align:center;padding:30px 0;color:#666;border-top:1px solid rgba(255,255,255,0.1);margin-top:60px;}
+        footer a{color:#0ff;text-decoration:none;}
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div class="container">
+        <header>
+            <h1 class="title">BLACKHOLE</h1>
+            <h1 style="font-size:2rem;margin-top:-10px;">TIKTOK DOWNLOADER</h1>
+        </header>
+
+        <div class="search">
+            <input type="text" id="url" placeholder="PASTE TIKTOK URL..." value="https://www.tiktok.com/@tiktok/video/7123456789012345678">
+            <button onclick="fetchVideo()">⟳ DOWNLOAD</button>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div class="glow-blue">ACCESSING BLACKHOLE...</div>
+        </div>
+
+        <div class="error" id="error"></div>
+
+        <div class="result" id="result">
+            <div class="card">
+                <div class="preview">
+                    <video id="preview" controls poster="https://via.placeholder.com/400x600/1a1a2e/0ff?text=TIKTOK">
+                        <source src="#" type="video/mp4">
+                    </video>
+                </div>
+                <div class="info">
+                    <h2 id="title">BLACKHOLE VIDEO</h2>
+                    <div class="meta">
+                        <span><i>⏱️</i> <span id="duration">00:45</span></span>
+                        <span><i>👤</i> <span id="author">@blackhole</span></span>
+                        <span><i>❤️</i> <span id="likes">1.2M</span></span>
+                    </div>
+                    <div class="buttons">
+                        <a href="#" class="btn btn-primary" id="downloadNoWatermark" download>⬇️ NO WM</a>
+                        <a href="#" class="btn btn-watermark" id="downloadWithWatermark" download>⬇️ WITH WM</a>
+                        <a href="#" class="btn btn-secondary" id="downloadAudio" download>🎵 AUDIO</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2024 BLACKHOLE | Created by <a href="#">XYRICS</a></p>
+        </footer>
+    </div>
+
+    <script>
+        // BLACKHOLE ANIMATION
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let w, h, p = [];
+        
+        function init() {
+            w = window.innerWidth;
+            h = window.innerHeight;
+            canvas.width = w;
+            canvas.height = h;
+            
+            for (let i = 0; i < 150; i++) {
+                p.push({
+                    x: Math.random() * w,
+                    y: Math.random() * h,
+                    r: Math.random() * 2 + 1,
+                    s: Math.random() * 2 + 0.5,
+                    a: Math.random() * Math.PI * 2,
+                    c: `rgba(255,255,255,${Math.random()*0.5+0.3})`
+                });
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, w, h);
+            const cx = w/2, cy = h/2;
+            
+            p.forEach(p => {
+                const dx = cx - p.x, dy = cy - p.y;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                
+                if (dist > 10) {
+                    const angle = Math.atan2(dy, dx);
+                    const speed = p.s * (1 - Math.min(dist/500, 0.8));
+                    p.x += Math.cos(angle) * speed;
+                    p.y += Math.sin(angle) * speed;
+                    p.a += 0.01;
+                    p.x += Math.cos(p.a) * 0.5;
+                    p.y += Math.sin(p.a) * 0.5;
+                } else {
+                    p.x = Math.random() * w;
+                    p.y = Math.random() * h;
+                }
+                
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+                ctx.fillStyle = p.c;
+                ctx.fill();
+            });
+            
+            requestAnimationFrame(draw);
+        }
+
+        window.addEventListener('resize', init);
+        init();
+        draw();
+
+        // DOWNLOAD FUNCTIONS
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        function showError(msg) {
+            const e = document.getElementById('error');
+            e.style.display = 'block';
+            e.textContent = '❌ ' + msg;
+            setTimeout(() => e.style.display = 'none', 3000);
+        }
+
+        function fetchVideo() {
+            const url = document.getElementById('url').value.trim();
+            if (!url) return showError('Masukin URL goblok!');
+            
+            showLoading(true);
+            document.getElementById('result').style.display = 'none';
+
+            // SIMULASI API
+            setTimeout(() => {
+                showLoading(false);
+                
+                // Demo data
+                document.getElementById('title').textContent = 'BLACKHOLE VIDEO';
+                document.getElementById('duration').textContent = '00:45';
+                document.getElementById('author').textContent = '@blackhole';
+                document.getElementById('likes').textContent = '1.2M';
+                
+                const videoUrl = 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4';
+                const preview = document.getElementById('preview');
+                preview.querySelector('source').src = videoUrl;
+                preview.load();
+                
+                document.getElementById('downloadNoWatermark').href = videoUrl;
+                document.getElementById('downloadWithWatermark').href = videoUrl;
+                document.getElementById('downloadAudio').href = 'https://sample-videos.com/audio/mp3/crowd-cheering.mp3';
+                
+                document.getElementById('result').style.display = 'block';
+            }, 2000);
+        }
+
+        document.getElementById('url').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') fetchVideo();
+        });
+
+        window.addEventListener('load', () => setTimeout(fetchVideo, 1000));
+    </script>
+</body>
+</html>
