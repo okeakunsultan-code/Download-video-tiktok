@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BLACKHOLE TIKTOK</title>
+    <title>BLACKHOLE TIKTOK DOWNLOADER</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:'Orbitron',sans-serif;}
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
@@ -80,13 +80,13 @@
         </header>
 
         <div class="search">
-            <input type="text" id="url" placeholder="PASTE TIKTOK URL..." value="https://www.tiktok.com/@tiktok/video/7123456789012345678">
+            <input type="text" id="url" placeholder="PASTE TIKTOK URL DISINI..." value="https://www.tiktok.com/@tiktok/video/7123456789012345678">
             <button onclick="fetchVideo()">⟳ DOWNLOAD</button>
         </div>
 
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <div class="glow-blue">ACCESSING BLACKHOLE...</div>
+            <div class="glow-blue">ACCESSING BLACKHOLE DATABASE...</div>
         </div>
 
         <div class="error" id="error"></div>
@@ -101,14 +101,14 @@
                 <div class="info">
                     <h2 id="title">BLACKHOLE VIDEO</h2>
                     <div class="meta">
-                        <span><i>⏱️</i> <span id="duration">00:45</span></span>
-                        <span><i>👤</i> <span id="author">@blackhole</span></span>
-                        <span><i>❤️</i> <span id="likes">1.2M</span></span>
+                        <span><i>⏱️</i> <span id="duration">00:00</span></span>
+                        <span><i>👤</i> <span id="author">@loading</span></span>
+                        <span><i>❤️</i> <span id="likes">0</span></span>
                     </div>
                     <div class="buttons">
-                        <a href="#" class="btn btn-primary" id="downloadNoWatermark" download>⬇️ NO WM</a>
-                        <a href="#" class="btn btn-watermark" id="downloadWithWatermark" download>⬇️ WITH WM</a>
-                        <a href="#" class="btn btn-secondary" id="downloadAudio" download>🎵 AUDIO</a>
+                        <a href="#" class="btn btn-primary" id="downloadNoWatermark" download target="_blank">⬇️ NO WM</a>
+                        <a href="#" class="btn btn-watermark" id="downloadWithWatermark" download target="_blank">⬇️ WITH WM</a>
+                        <a href="#" class="btn btn-secondary" id="downloadAudio" download target="_blank">🎵 AUDIO</a>
                     </div>
                 </div>
             </div>
@@ -120,7 +120,7 @@
     </div>
 
     <script>
-        // BLACKHOLE ANIMATION
+        // ==================== BLACKHOLE ANIMATION ====================
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         let w, h, p = [];
@@ -177,7 +177,7 @@
         init();
         draw();
 
-        // DOWNLOAD FUNCTIONS
+        // ==================== TIKTOK DOWNLOADER API ====================
         function showLoading(show) {
             document.getElementById('loading').style.display = show ? 'block' : 'none';
         }
@@ -186,44 +186,69 @@
             const e = document.getElementById('error');
             e.style.display = 'block';
             e.textContent = '❌ ' + msg;
-            setTimeout(() => e.style.display = 'none', 3000);
+            setTimeout(() => e.style.display = 'none', 5000);
         }
 
-        function fetchVideo() {
+        async function fetchVideo() {
             const url = document.getElementById('url').value.trim();
-            if (!url) return showError('Masukin URL goblok!');
             
+            if (!url) {
+                showError('MASUKIN URL DULU GOBLOK!');
+                return;
+            }
+
+            if (!url.includes('tiktok.com')) {
+                showError('ITU BUKAN URL TIKTOK ANJING!');
+                return;
+            }
+
             showLoading(true);
             document.getElementById('result').style.display = 'none';
 
-            // SIMULASI API
-            setTimeout(() => {
-                showLoading(false);
-                
-                // Demo data
-                document.getElementById('title').textContent = 'BLACKHOLE VIDEO';
-                document.getElementById('duration').textContent = '00:45';
-                document.getElementById('author').textContent = '@blackhole';
-                document.getElementById('likes').textContent = '1.2M';
-                
-                const videoUrl = 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4';
-                const preview = document.getElementById('preview');
-                preview.querySelector('source').src = videoUrl;
-                preview.load();
-                
-                document.getElementById('downloadNoWatermark').href = videoUrl;
-                document.getElementById('downloadWithWatermark').href = videoUrl;
-                document.getElementById('downloadAudio').href = 'https://sample-videos.com/audio/mp3/crowd-cheering.mp3';
-                
-                document.getElementById('result').style.display = 'block';
-            }, 2000);
+            try {
+                // PAKE API TIKWM (GRATIS & CEPET)
+                const apiUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`;
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                if (data.code === 0) {
+                    const videoData = data.data;
+                    
+                    // Update info
+                    document.getElementById('title').textContent = videoData.title || 'TikTok Video';
+                    document.getElementById('duration').textContent = videoData.duration || '00:30';
+                    document.getElementById('author').textContent = videoData.author || '@user';
+                    document.getElementById('likes').textContent = videoData.digg_count || '0';
+                    
+                    // Set video preview (pake yang no watermark)
+                    const videoUrl = 'https://www.tikwm.com' + (videoData.play || videoData.wmplay);
+                    const preview = document.getElementById('preview');
+                    preview.querySelector('source').src = videoUrl;
+                    preview.load();
+                    
+                    // Set download links
+                    const noWmUrl = videoData.play ? 'https://www.tikwm.com' + videoData.play : videoUrl;
+                    const wmUrl = videoData.wmplay ? 'https://www.tikwm.com' + videoData.wmplay : videoUrl;
+                    const audioUrl = videoData.music ? 'https://www.tikwm.com' + videoData.music : '#';
+                    
+                    document.getElementById('downloadNoWatermark').href = noWmUrl;
+                    document.getElementById('downloadWithWatermark').href = wmUrl;
+                    document.getElementById('downloadAudio').href = audioUrl;
+                    
+                    document.getElementById('result').style.display = 'block';
+                } else {
+                    showError('GAGAL NGAMBIL VIDEO: ' + (data.msg || 'Unknown error'));
+                }
+            } catch (error) {
+                showError('ERROR: ' + error.message);
+            }
+
+            showLoading(false);
         }
 
         document.getElementById('url').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') fetchVideo();
         });
-
-        window.addEventListener('load', () => setTimeout(fetchVideo, 1000));
     </script>
 </body>
 </html>
